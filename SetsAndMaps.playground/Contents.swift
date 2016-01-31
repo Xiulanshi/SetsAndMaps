@@ -252,7 +252,7 @@ genres.contains("Pop")
 genres.add("R&B") // Uh-oh
 
 */
-
+/*
 protocol SetProtocol {
     typealias ItemType
     mutating func add(item: ItemType)
@@ -320,4 +320,107 @@ genres.contains("Western")
 
 //genres.remove("Pop")
 genres.contains("Pop")
+*/
 
+
+protocol MapProtocol {
+    typealias KeyType
+    typealias ValueType
+    subscript(k: KeyType) -> ValueType? {get set}
+    mutating func remove(k: KeyType)
+}
+
+// An array of elements where each element is
+//    An array of elements where each element is
+//        A tuple of K, V
+
+struct HashMap<K: Hashable, V>: MapProtocol, CustomStringConvertible {
+    var table: [[(K, V)]]
+    init(capacity: Int = 8) {
+        table = [[(K, V)]](count: capacity, repeatedValue: [])
+    }
+    // MapProtocol
+    typealias KeyType = K
+    typealias ValueType = V
+    subscript(k: K) -> V? {
+        get {
+            let hashValue = abs(k.hashValue % table.count)
+            for item in table[hashValue] {
+                if (item.0 == k) {
+                    return item.1
+                }
+            }
+            //return table[hashValue].filter({$0.0 == k}).first?.1
+            return nil
+        }
+        
+        set(v) {
+            let hashValue = abs(k.hashValue % table.count)
+            table[hashValue].append((k, v!))
+        }
+    }
+    
+    mutating func remove(k: K) {
+        let hashValue = abs(k.hashValue % table.count)
+        if let idx = table[hashValue].indexOf({$0.0 == k}) {
+            table[hashValue].removeAtIndex(idx)
+        }
+    }
+    
+    // CustomStringConvertible
+    var description: String {
+        var str = ""
+        for entry in table {
+            str += "\(entry)"
+            str += "\n"
+        }
+        return str
+    }
+}
+
+var nicknames = HashMap<String, String>()
+
+nicknames["Michael"] = "Mike"
+nicknames["Barbara"] = "Babs"
+nicknames["Janet"] = "Jenny"
+nicknames["Matthew"] = "Matt"
+nicknames["Fredrick"] = "Fred"
+print(nicknames)
+
+nicknames["Michael"]
+
+nicknames.remove("Michael")
+nicknames["Michael"]
+
+//struct HashMap<K, V>: MapProtocol {
+//    //MapProtocol
+//    typealias KeyType = K
+//    typealias ValueType = V
+//    subscript(k: K) -> V? {
+//        get {
+//            return "Hi" as? V
+//        }
+//        set(v) {
+//            
+//        }
+//    }
+//    mutating func remove(k: K) {
+//        
+//    }
+//
+//}
+
+//var nickNames = HashMap<String, String>()
+//
+//nickNames["Michael"] = "Mike" //nicknames.subscript("Michael") = "Mike"
+//nickNames["Michael"]          //nicknames.subscript("Michael")
+//
+//var nickNames = Dictionary<String, String>()
+//
+//nickNames["Michael"] = "Mike"
+//nickNames["Margaret"] = "Peggy"
+//nickNames["William"] = "Bill"
+//
+//nickNames["Michael"]
+//
+//nickNames
